@@ -1,7 +1,12 @@
 import os
 import random
+import argparse
+
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 import django
+
 django.setup()
 from datacenter.models import Chastisement
 from datacenter.models import Commendation
@@ -23,7 +28,7 @@ def remove_chastisements(schoolkid):
         chastisement.delete()
 
 
-def create_commendation(schoolkid, subject):
+def create_commendation(schoolkid, subject_name):
     commendation_text = ['Молодец!',
                          'Отлично!',
                          'Хорошо!',
@@ -32,7 +37,7 @@ def create_commendation(schoolkid, subject):
                          ]
     lesson = random.choice(Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
                                                  group_letter=schoolkid.group_letter,
-                                                 subject__title=subject))
+                                                 subject__title=subject_name))
     Commendation.objects.create(text=random.choice(commendation_text),
                                 created=lesson.date,
                                 schoolkid=schoolkid,
@@ -40,15 +45,31 @@ def create_commendation(schoolkid, subject):
                                 teacher=lesson.teacher)
 
 
-# schoolkid_name = 'Фролов Иван'
-# schoolkid = Schoolkid.objects.filter(full_name__contains=schoolkid_name)[0]
-# fix_marks(schoolkid)
-# remove_chastisements(schoolkid)
-# math_6A = Lesson.objects.filter(year_of_study=6, group_letter='А', subject__title='Математика')
-
 if __name__ == '__main__':
-    schoolkid_name = 'Фролов Иван'
-    schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
-    fix_marks(schoolkid)
-    remove_chastisements(schoolkid)
-    create_commendation(schoolkid, 'Музыка')
+    parser = argparse.ArgumentParser(
+        description='Программа улучшает успеваемость в онлайн дневнике')
+    parser.add_argument(
+        '-kidn', '--schoolkid_name', help='Имя ученика', type=str, default='Иван')
+    parser.add_argument(
+        '-kids', '--schoolkid_surname', help='Фамилия ученика', type=str, default='Фролов')
+    parser.add_argument(
+        '-subj', '--subject_name', help='id страницы с которой начать закачку', type=str, default='Музыка')
+    args = parser.parse_args()
+    schoolkid_name = f'{args.schoolkid_surname} {args.schoolkid_name}'
+    try:
+        schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
+    except ObjectDoesNotExist:
+        print(f'Ученик не найден, уточните имя {schoolkid_name}')
+    except MultipleObjectsReturned:
+        print('Найдено несколько учеников, уточните имя')
+    else:
+        print(f'Ученик найден...{schoolkid_name}')
+        fix_marks(schoolkid)
+        print('исправляем оценки')
+        remove_chastisements(schoolkid)
+        print('удаляем замечания')
+        try:
+            create_commendation(schoolkid, args.subject_name)
+            print(f'добавляем похвалу по предмету...{args.subject_name}')
+        except IndexError:
+            print('Предмет не найдет, проверьте название')
