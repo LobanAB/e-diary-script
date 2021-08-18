@@ -53,7 +53,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-kids', '--schoolkid_surname', help='Фамилия ученика', type=str, default='Фролов')
     parser.add_argument(
-        '-subj', '--subject_name', help='id страницы с которой начать закачку', type=str, default='Музыка')
+        '-subj', '--subject_name', help='Название предмета', type=str, default='Музыка')
     args = parser.parse_args()
     schoolkid_name = f'{args.schoolkid_surname} {args.schoolkid_name}'
     try:
@@ -72,4 +72,4 @@ if __name__ == '__main__':
             create_commendation(schoolkid, args.subject_name)
             print(f'добавляем похвалу по предмету...{args.subject_name}')
         except IndexError:
-            print('Предмет не найдет, проверьте название')
+            print(f'Предмет {args.subject_name} не найдет, проверьте название')
