@@ -70,4 +70,6 @@ if __name__ == '__main__':
             create_commendation(schoolkid, args.subject_name)
             print(f'добавляем похвалу по предмету...{args.subject_name}')
         except IndexError:
-            print(f'Предмет {args.subject_name} не найдет, проверьте название')
+            print('Предмет не найдет, проверьте название')
+        except AttributeError:
+            print('Уроки не найдены, уточните предмет')
