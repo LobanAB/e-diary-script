@@ -33,9 +33,9 @@ def create_commendation(schoolkid, subject_name):
                          'Великолепно!',
                          'Ты на верном пути!'
                          ]
-    lesson = random.choice(Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
-                                                 group_letter=schoolkid.group_letter,
-                                                 subject__title=subject_name))
+    lesson = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
+                                   group_letter=schoolkid.group_letter,
+                                   subject__title=subject_name).order_by('?').first()
     Commendation.objects.create(text=random.choice(commendation_text),
                                 created=lesson.date,
                                 schoolkid=schoolkid,
