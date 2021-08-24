@@ -2,8 +2,6 @@ import os
 import random
 import argparse
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 import django
 
@@ -58,9 +56,9 @@ if __name__ == '__main__':
     schoolkid_name = f'{args.schoolkid_surname} {args.schoolkid_name}'
     try:
         schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
-    except ObjectDoesNotExist:
+    except Schoolkid.DoesNotExist:
         print(f'Ученик не найден, уточните имя {schoolkid_name}')
-    except MultipleObjectsReturned:
+    except Schoolkid.MultipleObjectsReturned:
         print('Найдено несколько учеников, уточните имя')
     else:
         print(f'Ученик найден...{schoolkid_name}')
