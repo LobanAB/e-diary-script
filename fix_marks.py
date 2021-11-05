@@ -36,11 +36,15 @@ def create_commendation(schoolkid, subject_name):
     lesson = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
                                    group_letter=schoolkid.group_letter,
                                    subject__title=subject_name).order_by('?').first()
-    Commendation.objects.create(text=random.choice(commendation_text),
+    if lesson is not None:
+        Commendation.objects.create(text=random.choice(commendation_text),
                                 created=lesson.date,
                                 schoolkid=schoolkid,
                                 subject=lesson.subject,
                                 teacher=lesson.teacher)
+        print(f'добавляем похвалу по предмету...{lesson.subject}')
+    else:
+        print('Предмет не найдет, проверьте название')
 
 
 if __name__ == '__main__':
@@ -68,8 +72,5 @@ if __name__ == '__main__':
         print('удаляем замечания')
         try:
             create_commendation(schoolkid, args.subject_name)
-            print(f'добавляем похвалу по предмету...{args.subject_name}')
-        except IndexError:
-            print('Предмет не найдет, проверьте название')
         except AttributeError:
             print('Уроки не найдены, уточните предмет')
